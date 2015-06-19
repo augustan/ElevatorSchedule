@@ -79,7 +79,7 @@ public class Seed {
     }
     
     public String toDumpString() {
-        String record = String.format("[%d]: from %d %s to %d, after %d", id, floor,
+        String record = String.format("#%d#:[from %d %s to %d, after %d]", id, floor,
                 isDown ? DIR_DOWN : DIR_UP, toFloor, waitTime);
         return record;
     }

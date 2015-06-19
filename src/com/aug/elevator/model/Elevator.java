@@ -105,11 +105,18 @@ public class Elevator {
                     currentFloor, getCurrentLoad()));
         }
     }
+    
+    private void setMoveStatus(MoveStatus status) {
+        if (moveStatus != status) {
+            LogUtils.d(String.format("   [STATUS] #%d# from %s to %s", id, moveStatus, status));
+            moveStatus = status;
+        }
+    }
 
     public void gotoNextFloor() {
         if (moveStatus == MoveStatus.DOWN) {
             if (isReachBottom()) {
-                moveStatus = MoveStatus.IDLE;
+                setMoveStatus(MoveStatus.IDLE);
             } else {
                 currentFloor--;
                 totalStep++;
@@ -120,7 +127,7 @@ public class Elevator {
             }
         } else if (moveStatus == MoveStatus.UP) {
             if (isReachTop()) {
-                moveStatus = MoveStatus.IDLE;
+                setMoveStatus(MoveStatus.IDLE);
             } else {
                 currentFloor++;
                 totalStep++;
@@ -136,11 +143,11 @@ public class Elevator {
         if (getCurrentLoad() == 0) {
             if (currentFloor >= edgeFloor.getTop() || 
                     currentFloor <= edgeFloor.getBottom()) {
-                moveStatus = MoveStatus.IDLE;
+                setMoveStatus(MoveStatus.IDLE);
             } else if (moveStatus == MoveStatus.DOWN) {
-                moveStatus = MoveStatus.PRE_DOWN;
+                setMoveStatus(MoveStatus.PRE_DOWN);
             } else if (moveStatus == MoveStatus.UP) {
-                moveStatus = MoveStatus.PRE_UP;
+                setMoveStatus(MoveStatus.PRE_UP);
             }
         }
     }
@@ -154,17 +161,17 @@ public class Elevator {
       boolean setted = false;
       if (moveStatus == MoveStatus.IDLE) {
           if (currentFloor != seedAtFloor) {
-              moveStatus = currentFloor > seedAtFloor ? MoveStatus.DOWN : MoveStatus.UP;
+              setMoveStatus(currentFloor > seedAtFloor ? MoveStatus.DOWN : MoveStatus.UP);
               setted = true;
           } else {
-              moveStatus = currentFloor > seedGotoFloor ? MoveStatus.DOWN : MoveStatus.UP;
+              setMoveStatus(currentFloor > seedGotoFloor ? MoveStatus.DOWN : MoveStatus.UP);
               setted = true;
           }
       } else if (moveStatus == MoveStatus.PRE_DOWN && currentFloor > seedAtFloor) {
-          moveStatus = MoveStatus.DOWN;
+          setMoveStatus(MoveStatus.DOWN);
           setted = true;
       } else if (moveStatus == MoveStatus.PRE_UP && currentFloor < seedAtFloor) {
-          moveStatus = MoveStatus.UP;
+          setMoveStatus(MoveStatus.UP);
           setted = true;
       }
 
@@ -176,7 +183,7 @@ public class Elevator {
     public void setActiveIdle() {
         if (getCurrentLoad() == 0 &&
                 (moveStatus == MoveStatus.PRE_DOWN || moveStatus == MoveStatus.PRE_UP)) {
-            moveStatus = MoveStatus.IDLE;
+            setMoveStatus(MoveStatus.IDLE);
         }
     }
 
