@@ -28,6 +28,10 @@ public class Seed {
     
     private int markElevterId = -1;
     private int minStepCost = Integer.MAX_VALUE;
+    
+    private int beginTime = 0;    // 开始等待的时间。统计用
+    private int takeTime = 0;     // 上电梯的时间。统计用
+    private int releaseTime = 0;  // 下电梯的时间。统计用
 
     private Seed() {
     }
@@ -120,5 +124,29 @@ public class Seed {
             this.markElevterId = markElevterId;
             LogUtils.d("   [SEED] " + this.toDumpString() + " set ElevterId = " + markElevterId);
         }
+    }
+    
+    public int getBeginTime() {
+        return beginTime;
+    }
+    
+    public void setBeginTime(int beginTime) {
+        this.beginTime = beginTime;
+    }
+    
+    public int getTakeTime() {
+        return takeTime;
+    }
+    
+    public void setTakeTime(int takeTime) {
+        this.takeTime = takeTime;
+    }
+    
+    public int getReleaseTime() {
+        return releaseTime;
+    }
+    
+    public void setReleaseTime(int releaseTime) {
+        this.releaseTime = releaseTime;
     }
 }

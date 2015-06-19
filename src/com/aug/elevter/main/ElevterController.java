@@ -3,6 +3,7 @@ package com.aug.elevter.main;
 import com.aug.elevter.model.EdgeSeedFloor;
 import com.aug.elevter.model.Elevter;
 import com.aug.elevter.model.Seed;
+import com.aug.elevter.model.Statistic;
 import com.aug.elevter.model.collect.ElevterCollect;
 import com.aug.elevter.model.collect.SeedsOnFloorCollect;
 import com.aug.elevter.tools.LogUtils;
@@ -14,8 +15,6 @@ import java.util.TimerTask;
 
 public class ElevterController extends TimerTask {
     
-    private int runTimeCountLog = 1;
-
     private Timer globalTimer;
     private SeedsReader reader = null;
     
@@ -43,9 +42,10 @@ public class ElevterController extends TimerTask {
     
     @Override
     public void run() {
-        LogUtils.d("run time = " + runTimeCountLog);
-        if (runTimeCountLog == 45) {
-            int debug = runTimeCountLog;
+        int timeCount = Statistic.onTimeLapse();
+        LogUtils.d("run time = " + timeCount);
+        if (timeCount == 40) {
+            int debug = timeCount;
             debug++;
         }
 
@@ -61,16 +61,15 @@ public class ElevterController extends TimerTask {
             dumpCurrentStatus();
         } else {
             globalTimer.cancel();
-            LogUtils.d("! total step = " + getTotalElevterStep());
-            LogUtils.d("! total load = " + getTotalElevterLoad());
+            Statistic.showResule();
             synchronized (this) {
                 this.notifyAll();
             }
         }
-        runTimeCountLog++;
     }
 
     private void onProcessSeed(Seed seed) {
+        Statistic.onShowNewSeed(seed);
         LogUtils.d("   [new seed] = " + seed.toDumpString());
         seedsOnFloorCollect.add(seed.getFloor() - 1, seed);
     }
@@ -158,25 +157,25 @@ public class ElevterController extends TimerTask {
         return idleCnt == elevterCount;
     }
     
-    private int getTotalElevterStep() {
-        int step = 0;
-        int elevterCount = elevterCollect.getSize();
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            step += elevter.getTotalStep();
-        }
-        return step;
-    }
-
-    private int getTotalElevterLoad() {
-        int load = 0;
-        int elevterCount = elevterCollect.getSize();
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            load += elevter.getTotalLoad();
-        }
-        return load;
-    }
+//    private int getTotalElevterStep() {
+//        int step = 0;
+//        int elevterCount = elevterCollect.getSize();
+//        for (int i = 0; i < elevterCount; i++) {
+//            Elevter elevter = elevterCollect.get(i);
+//            step += elevter.getTotalStep();
+//        }
+//        return step;
+//    }
+//
+//    private int getTotalElevterLoad() {
+//        int load = 0;
+//        int elevterCount = elevterCollect.getSize();
+//        for (int i = 0; i < elevterCount; i++) {
+//            Elevter elevter = elevterCollect.get(i);
+//            load += elevter.getTotalLoad();
+//        }
+//        return load;
+//    }
     
     private void dumpCurrentStatus() {
         
