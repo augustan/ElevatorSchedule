@@ -14,6 +14,7 @@ public class Elevter {
     }
 
     private int totalStep = 0;
+    private int totalLoad = 0;  // 总负载
 
     private int id = 0;
     private int maxLoad = Constants.elevterLoadCapacity;
@@ -105,8 +106,9 @@ public class Elevter {
             } else {
                 currentFloor--;
                 totalStep++;
-                LogUtils.e(String.format("   [MOVE] #%d# move down at %d. total step = %d", id, currentFloor,
-                        totalStep));
+                totalLoad += getCurrentLoad();
+                LogUtils.e(String.format("   [MOVE] #%d# move down at %d. total_step = %d, total_load = %d", id, currentFloor,
+                        totalStep, totalLoad));
             }
         } else if (moveStatus == MoveStatus.UP) {
             if (isGetTop()) {
@@ -114,8 +116,9 @@ public class Elevter {
             } else {
                 currentFloor++;
                 totalStep++;
-                LogUtils.e(String.format("   [MOVE] #%d# move up at %d. total step = %d", id, currentFloor,
-                        totalStep));
+                totalLoad += getCurrentLoad();
+                LogUtils.e(String.format("   [MOVE] #%d# move up at %d. total_step = %d, total_load = %d", id, currentFloor,
+                        totalStep, totalLoad));
             }
         }
     }
@@ -162,5 +165,9 @@ public class Elevter {
     
     public int getTotalStep() {
         return totalStep;
+    }
+    
+    public int getTotalLoad() {
+        return totalLoad;
     }
 }

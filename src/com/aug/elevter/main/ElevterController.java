@@ -31,7 +31,7 @@ public class ElevterController extends TimerTask {
     }
     
     public void start() {
-        globalTimer.scheduleAtFixedRate(this, 0, 100);
+        globalTimer.scheduleAtFixedRate(this, 0, Constants.timeSlot);
     }
     
     private boolean shouldContinue() {
@@ -61,6 +61,7 @@ public class ElevterController extends TimerTask {
         } else {
             globalTimer.cancel();
             LogUtils.d("! total step = " + getTotalElevterStep());
+            LogUtils.d("! total load = " + getTotalElevterLoad());
             synchronized (this) {
                 this.notifyAll();
             }
@@ -168,6 +169,16 @@ public class ElevterController extends TimerTask {
             step += elevter.getTotalStep();
         }
         return step;
+    }
+
+    private int getTotalElevterLoad() {
+        int load = 0;
+        int elevterCount = elevterCollect.getSize();
+        for (int i = 0; i < elevterCount; i++) {
+            Elevter elevter = elevterCollect.get(i);
+            load += elevter.getTotalLoad();
+        }
+        return load;
     }
     
     private void dumpCurrentStatus() {
