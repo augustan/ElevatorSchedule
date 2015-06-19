@@ -11,7 +11,6 @@ public class Constants {
     // 每个电梯载人量
     public static int elevterLoadCapacity = 10;
 
-
     // 单位时长(ms)
     public static final int timeSlot = 1;
     

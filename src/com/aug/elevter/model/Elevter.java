@@ -85,6 +85,7 @@ public class Elevter {
             Seed seed = loadSeeds.get(i);
             if (seed.getToFloor() == currentFloor) {
                 loadSeeds.remove(i);
+                Statistic.onReleaseSeed(seed);
                 LogUtils.e(String.format("   [RELEASE] #%d# release %s. at floor = %d. load = %d", id,
                         seed.toDumpString(), currentFloor, getCurrentLoad()));
             }
@@ -94,6 +95,7 @@ public class Elevter {
     public void takeSeeds(ArrayList<Seed> newSeeds) {
         for (Seed seed : newSeeds) {
             loadSeeds.add(seed);
+            Statistic.onTakeSeed(seed);
             LogUtils.e(String.format("   [TAKE] #%d# take %s. at floor = %d. load = %d", id, seed.toDumpString(),
                     currentFloor, getCurrentLoad()));
         }
@@ -107,6 +109,7 @@ public class Elevter {
                 currentFloor--;
                 totalStep++;
                 totalLoad += getCurrentLoad();
+                Statistic.onMove(this);
                 LogUtils.e(String.format("   [MOVE] #%d# move down at %d. total_step = %d, total_load = %d", id, currentFloor,
                         totalStep, totalLoad));
             }
@@ -117,6 +120,7 @@ public class Elevter {
                 currentFloor++;
                 totalStep++;
                 totalLoad += getCurrentLoad();
+                Statistic.onMove(this);
                 LogUtils.e(String.format("   [MOVE] #%d# move up at %d. total_step = %d, total_load = %d", id, currentFloor,
                         totalStep, totalLoad));
             }
