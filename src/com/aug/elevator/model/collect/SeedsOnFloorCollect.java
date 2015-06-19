@@ -1,8 +1,8 @@
-package com.aug.elevtor.model.collect;
+package com.aug.elevator.model.collect;
 
-import com.aug.elevtor.model.EdgeSeedFloor;
-import com.aug.elevtor.model.Seed;
-import com.aug.elevtor.model.Elevtor.MoveStatus;
+import com.aug.elevator.model.EdgeSeedFloor;
+import com.aug.elevator.model.Seed;
+import com.aug.elevator.model.Elevator.MoveStatus;
 
 import java.util.ArrayList;
 
@@ -29,18 +29,18 @@ public class SeedsOnFloorCollect {
         list.add(seed);
     }
     
-    public ArrayList<Seed> takeSeeds(int floor, int elevtorId, MoveStatus moveStatus) {
+    public ArrayList<Seed> takeSeeds(int floor, int elevatorId, MoveStatus moveStatus) {
 
-        boolean elevtorIdle = moveStatus == MoveStatus.IDLE;
-        boolean elevtorGoUp = moveStatus == MoveStatus.UP;
-        boolean elevtorGoDown = moveStatus == MoveStatus.DOWN;
+        boolean elevatorIdle = moveStatus == MoveStatus.IDLE;
+        boolean elevatorGoUp = moveStatus == MoveStatus.UP;
+        boolean elevatorGoDown = moveStatus == MoveStatus.DOWN;
         
         ArrayList<Seed> taken = new ArrayList<Seed>();
         ArrayList<Seed> list = getSeedsListAt(floor);
         for (int i = list.size() - 1; i >= 0; i--) {
             Seed seed = list.get(i);
-            boolean sameDir = elevtorIdle || (elevtorGoUp && !seed.isDown()) || (elevtorGoDown && seed.isDown());
-            if (seed.getMarkElevtorId() == elevtorId && sameDir) {
+            boolean sameDir = elevatorIdle || (elevatorGoUp && !seed.isDown()) || (elevatorGoDown && seed.isDown());
+            if (seed.getMarkElevatorId() == elevatorId && sameDir) {
                 taken.add(list.remove(i));
             }
         }
@@ -75,7 +75,7 @@ public class SeedsOnFloorCollect {
 
     private void resetStepCost(ArrayList<Seed> list) {
         for (Seed seed : list) {
-            seed.clearMarkElevtorId();
+            seed.clearMarkElevatorId();
         }
     }
     

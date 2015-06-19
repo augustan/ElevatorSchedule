@@ -1,4 +1,4 @@
-package com.aug.elevtor.model;
+package com.aug.elevator.model;
 
 /**
  * 楼层数从1开始

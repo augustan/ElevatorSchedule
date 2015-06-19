@@ -1,7 +1,7 @@
-package com.aug.elevtor.tools;
+package com.aug.elevator.tools;
 
-import com.aug.elevtor.main.Constants;
-import com.aug.elevtor.model.Seed;
+import com.aug.elevator.main.Constants;
+import com.aug.elevator.model.Seed;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

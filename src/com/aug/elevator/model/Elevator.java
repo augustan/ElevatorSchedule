@@ -1,9 +1,9 @@
-package com.aug.elevtor.model;
+package com.aug.elevator.model;
 
-import com.aug.elevtor.main.Constants;
-import com.aug.elevtor.policy.ElevtorPolicy;
-import com.aug.elevtor.policy.StandardPolicy;
-import com.aug.elevtor.tools.LogUtils;
+import com.aug.elevator.main.Constants;
+import com.aug.elevator.policy.ElevatorPolicy;
+import com.aug.elevator.policy.StandardPolicy;
+import com.aug.elevator.tools.LogUtils;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 楼层数从1开始
  *
  */
-public class Elevtor {
+public class Elevator {
 
     public enum MoveStatus {
         UP, DOWN, IDLE, PRE_UP, PRE_DOWN,
@@ -21,17 +21,17 @@ public class Elevtor {
     private int totalLoad = 0;  // 总负载
 
     private int id = 0;
-    private int maxLoad = Constants.elevtorLoadCapacity;
+    private int maxLoad = Constants.elevatorLoadCapacity;
     private int topFloor = Constants.totalFloor;
     private int bottomFloor = 1;
 
     private MoveStatus moveStatus = MoveStatus.IDLE;
-    private ElevtorPolicy elevtorPolicy = new StandardPolicy();
+    private ElevatorPolicy elevatorPolicy = new StandardPolicy();
 
     private ArrayList<Seed> loadSeeds = new ArrayList<Seed>();
     private int currentFloor = bottomFloor;
 
-    public Elevtor(int id) {
+    public Elevator(int id) {
         this.id = id;
     }
 
@@ -82,7 +82,7 @@ public class Elevtor {
      */
     public void preHandleSeeds(int floor, ArrayList<Seed> seedsListAtFloor,
             int topFloor, int bottomFloor) {
-        elevtorPolicy.preHandleSeeds(this, floor, seedsListAtFloor, topFloor, bottomFloor);
+        elevatorPolicy.preHandleSeeds(this, floor, seedsListAtFloor, topFloor, bottomFloor);
     }
 
     private void releaseSeeds() {
@@ -164,7 +164,7 @@ public class Elevtor {
       }
 
       if (setted) {
-          LogUtils.d(String.format("   [ACTIVE] elevtor #%d# from %d to %d", id, currentFloor, atFloor));
+          LogUtils.d(String.format("   [ACTIVE] elevator #%d# from %d to %d", id, currentFloor, atFloor));
       }
     }
     

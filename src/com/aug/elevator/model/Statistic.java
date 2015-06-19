@@ -1,6 +1,6 @@
-package com.aug.elevtor.model;
+package com.aug.elevator.model;
 
-import com.aug.elevtor.tools.LogUtils;
+import com.aug.elevator.tools.LogUtils;
 
 public class Statistic {
     
@@ -16,9 +16,9 @@ public class Statistic {
         return timeTickTack;
     }
     
-    public static void onMove(Elevtor elevtor) {
+    public static void onMove(Elevator elevator) {
         totalStep++;
-        totalLoad += elevtor.getCurrentLoad();
+        totalLoad += elevator.getCurrentLoad();
     }
 
     /**
