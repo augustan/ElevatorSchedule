@@ -6,7 +6,7 @@ import com.aug.elevator.model.Seed;
 import java.util.ArrayList;
 
 public abstract class ElevatorPolicy {
-    abstract public void preHandleSeeds(Elevator elevator, int floor,
+    abstract public void preHandleSeeds(Elevator elevator, int seedAtFloor,
             ArrayList<Seed> seedsListAt,
             int topFloor, int bottomFloor);
 }

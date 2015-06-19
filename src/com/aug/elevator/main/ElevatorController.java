@@ -44,7 +44,7 @@ public class ElevatorController extends TimerTask {
     public void run() {
         int timeCount = Statistic.onTimeLapse();
         LogUtils.d("run time = " + timeCount);
-        if (timeCount == 40) {
+        if (timeCount == 18) {
             int debug = timeCount;
             debug++;
         }
@@ -101,33 +101,29 @@ public class ElevatorController extends TimerTask {
             }
         }
         
-//        int totalFloorSize = seedsOnFloorCollect.getFloorSize();
-//        for (int floor = 0; floor < totalFloorSize; floor++) {
-//            ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
-//            for (Seed seed : list) {
-//                int seedAtFloor = seed.getFloor();
-//                int elevatorId = seed.getMarkElevatorId();
-//                elevatorId--;
-//                if (elevatorId < 0 || elevatorId >= elevatorCount) {
-////                    LogUtils.e("!!! error !!! wrong elevatorId = " + elevatorId);
-//                } else {
-//                    Elevator elevator = elevatorCollect.get(elevatorId);
-//                    elevator.setActive(seedAtFloor);
-//                }
-//            }
-//        }
-//        for (int i = 0; i < elevatorCount; i++) {
-//            Elevator elevator = elevatorCollect.get(i);
-//            elevator.checkActive(false);
-//        }
+        // 4. 便利所有seed，启动有相应标记的电梯
+        int totalFloorSize = seedsOnFloorCollect.getFloorSize();
+        for (int floor = 0; floor < totalFloorSize; floor++) {
+            ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
+            for (Seed seed : list) {
+                int elevatorId = seed.getMarkElevatorId();
+                elevatorId--;
+                if (elevatorId < 0 || elevatorId >= elevatorCount) {
+//                    LogUtils.e("!!! error !!! wrong elevatorId = " + elevatorId);
+                } else {
+                    Elevator elevator = elevatorCollect.get(elevatorId);
+                    elevator.setActive(seed.getFloor(), seed.getToFloor());
+                }
+            }
+        }
 
-        // 4. 停下空载的电梯
+        // 5. 停下空载的电梯
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
             elevator.setActiveIdle();
         }
         
-        // 5. 电梯载人，走向下一个楼层
+        // 6. 电梯载人，走向下一个楼层
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
             int floor = elevator.getCurrentFloor();
@@ -138,7 +134,7 @@ public class ElevatorController extends TimerTask {
             elevator.gotoNextFloor();
         }
 
-        // 6. 电梯停在某楼层
+        // 7. 电梯停在某楼层
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
             elevator.onStopAtFloor();

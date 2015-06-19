@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class StandardPolicy extends ElevatorPolicy {
 
     @Override
-    public void preHandleSeeds(Elevator elevator, int floor, 
+    public void preHandleSeeds(Elevator elevator, int seedAtFloor, 
             ArrayList<Seed> seedsList,
             int topFloor, int bottomFloor) {
         if (seedsList.size() == 0) {
@@ -27,7 +27,6 @@ public class StandardPolicy extends ElevatorPolicy {
             int stepCost = 0;
             
             Seed seed = seedsList.get(i);
-            elevator.setActive(floor, seed.getToFloor());
             
             boolean elevatorIdle = elevator.getMoveStatus() == MoveStatus.IDLE;
             boolean elevatorGoUp = elevator.getMoveStatus() == MoveStatus.UP || elevator.getMoveStatus() == MoveStatus.PRE_UP;
@@ -35,16 +34,17 @@ public class StandardPolicy extends ElevatorPolicy {
             
             boolean sameDir = elevatorIdle || (elevatorGoUp && !seed.isDown()) || (elevatorGoDown && seed.isDown());
             if (sameDir) {
-                stepCost = Math.abs(elevator.getCurrentFloor() - floor);
+                stepCost = Math.abs(elevator.getCurrentFloor() - seedAtFloor);
             } else if (elevatorGoUp){
                 stepCost = Math.abs(elevator.getCurrentFloor() - topFloor);
-                stepCost += Math.abs(topFloor - floor);
+                stepCost += Math.abs(topFloor - seedAtFloor);
             } else if (elevatorGoDown) {
                 stepCost = Math.abs(elevator.getCurrentFloor() - bottomFloor);
-                stepCost += Math.abs(bottomFloor - floor);
+                stepCost += Math.abs(bottomFloor - seedAtFloor);
             }
+            
             seed.setMarkElevatorId(elevator.getId(), stepCost);
-            loadSpace--;
+//            loadSpace--;
         }
     }
 

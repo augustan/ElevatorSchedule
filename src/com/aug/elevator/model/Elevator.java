@@ -77,12 +77,12 @@ public class Elevator {
     /**
      * 在seed结构中标记出最小消耗的电梯id
      * 
-     * @param floor 实际楼层数。从1开始
+     * @param seedAtFloor seed所在的实际楼层数。从1开始
      * @param seedsListAtFloor
      */
-    public void preHandleSeeds(int floor, ArrayList<Seed> seedsListAtFloor,
+    public void preHandleSeeds(int seedAtFloor, ArrayList<Seed> seedsListAtFloor,
             int topFloor, int bottomFloor) {
-        elevatorPolicy.preHandleSeeds(this, floor, seedsListAtFloor, topFloor, bottomFloor);
+        elevatorPolicy.preHandleSeeds(this, seedAtFloor, seedsListAtFloor, topFloor, bottomFloor);
     }
 
     private void releaseSeeds() {
@@ -145,26 +145,31 @@ public class Elevator {
         }
     }
     
-    public void setActive(int atFloor, int gotoFloor) {
+    /**
+     * 
+     * @param seedAtFloor  seed 所在楼层
+     * @param seedGotoFloor   seed 要去的楼层
+     */
+    public void setActive(int seedAtFloor, int seedGotoFloor) {
       boolean setted = false;
       if (moveStatus == MoveStatus.IDLE) {
-          if (currentFloor != atFloor) {
-              moveStatus = currentFloor > atFloor ? MoveStatus.DOWN : MoveStatus.UP;
+          if (currentFloor != seedAtFloor) {
+              moveStatus = currentFloor > seedAtFloor ? MoveStatus.DOWN : MoveStatus.UP;
               setted = true;
           } else {
-              moveStatus = currentFloor > gotoFloor ? MoveStatus.DOWN : MoveStatus.UP;
+              moveStatus = currentFloor > seedGotoFloor ? MoveStatus.DOWN : MoveStatus.UP;
               setted = true;
           }
-      } else if (moveStatus == MoveStatus.PRE_DOWN && currentFloor > atFloor) {
+      } else if (moveStatus == MoveStatus.PRE_DOWN && currentFloor > seedAtFloor) {
           moveStatus = MoveStatus.DOWN;
           setted = true;
-      } else if (moveStatus == MoveStatus.PRE_UP && currentFloor < atFloor) {
+      } else if (moveStatus == MoveStatus.PRE_UP && currentFloor < seedAtFloor) {
           moveStatus = MoveStatus.UP;
           setted = true;
       }
 
       if (setted) {
-          LogUtils.d(String.format("   [ACTIVE] elevator #%d# from %d to %d", id, currentFloor, atFloor));
+          LogUtils.d(String.format("   [ACTIVE] elevator #%d# from %d to %d", id, currentFloor, seedAtFloor));
       }
     }
     
