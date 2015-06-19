@@ -115,8 +115,8 @@ public class Elevter {
                 totalStep++;
                 totalLoad += getCurrentLoad();
                 Statistic.onMove(this);
-                LogUtils.e(String.format("   [MOVE] #%d# move down at %d. total_step = %d, total_load = %d", id, currentFloor,
-                        totalStep, totalLoad));
+                LogUtils.e(String.format("   [MOVE] #%d# move down at %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
+                        totalStep, totalLoad, getCurrentLoad()));
             }
         } else if (moveStatus == MoveStatus.UP) {
             if (isReachTop()) {
@@ -126,8 +126,8 @@ public class Elevter {
                 totalStep++;
                 totalLoad += getCurrentLoad();
                 Statistic.onMove(this);
-                LogUtils.e(String.format("   [MOVE] #%d# move up at %d. total_step = %d, total_load = %d", id, currentFloor,
-                        totalStep, totalLoad));
+                LogUtils.e(String.format("   [MOVE] #%d# move up at %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
+                        totalStep, totalLoad, getCurrentLoad()));
             }
         }
     }
