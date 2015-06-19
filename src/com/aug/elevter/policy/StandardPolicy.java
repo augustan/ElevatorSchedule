@@ -9,7 +9,9 @@ import java.util.ArrayList;
 public class StandardPolicy extends ElevterPolicy {
 
     @Override
-    public void takeSeed(Elevter elevter, int floor, ArrayList<Seed> seedsList) {
+    public void preHandleSeeds(Elevter elevter, int floor, 
+            ArrayList<Seed> seedsList,
+            int topFloor, int bottomFloor) {
         if (seedsList.size() == 0) {
             return;
         }
@@ -17,32 +19,32 @@ public class StandardPolicy extends ElevterPolicy {
             return;
         }
 
-        if (elevter.getMoveStatus() == MoveStatus.UP && elevter.getCurrentFloor() > floor) {
-            return;
-        }
-        if (elevter.getMoveStatus() == MoveStatus.DOWN && elevter.getCurrentFloor() < floor) {
-            return;
-        }
-
-        int stepCost = Math.abs(elevter.getCurrentFloor() - floor);
+        
         int loadSpace = elevter.getLoadSpace();
         for (int i = 0; 0 < loadSpace && i < seedsList.size(); i++) {
+            // stepCost 不能只计算绝对值，要计算方向。
+            // 如果电梯向上走，要走到最上面有人的楼层，再向下
+            int stepCost = 0;
+            
             Seed seed = seedsList.get(i);
-            if (elevter.getMoveStatus() == MoveStatus.IDLE) {
-                elevter.setActive(floor);
-                seed.setMarkElevterId(elevter.getId(), stepCost);
-                loadSpace--;
-            } else if (elevter.getMoveStatus() == MoveStatus.DOWN) {
-                if (seed.isDown()) {
-                    seed.setMarkElevterId(elevter.getId(), stepCost);
-                    loadSpace--;
-                }
-            } else if (elevter.getMoveStatus() == MoveStatus.UP) {
-                if (!seed.isDown()) {
-                    seed.setMarkElevterId(elevter.getId(), stepCost);
-                    loadSpace--;
-                }
+            elevter.setActive(floor, seed.getToFloor());
+            
+            boolean elevterIdle = elevter.getMoveStatus() == MoveStatus.IDLE;
+            boolean elevterGoUp = elevter.getMoveStatus() == MoveStatus.UP || elevter.getMoveStatus() == MoveStatus.PRE_UP;
+            boolean elevterGoDown = elevter.getMoveStatus() == MoveStatus.DOWN || elevter.getMoveStatus() == MoveStatus.PRE_DOWN;
+            
+            boolean sameDir = elevterIdle || (elevterGoUp && !seed.isDown()) || (elevterGoDown && seed.isDown());
+            if (sameDir) {
+                stepCost = Math.abs(elevter.getCurrentFloor() - floor);
+            } else if (elevterGoUp){
+                stepCost = Math.abs(elevter.getCurrentFloor() - topFloor);
+                stepCost += Math.abs(topFloor - floor);
+            } else if (elevterGoDown) {
+                stepCost = Math.abs(elevter.getCurrentFloor() - bottomFloor);
+                stepCost += Math.abs(bottomFloor - floor);
             }
+            seed.setMarkElevterId(elevter.getId(), stepCost);
+            loadSpace--;
         }
     }
 

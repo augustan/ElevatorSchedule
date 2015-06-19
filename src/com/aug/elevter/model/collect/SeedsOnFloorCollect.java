@@ -1,10 +1,15 @@
 package com.aug.elevter.model.collect;
 
-import com.aug.elevter.model.Elevter;
+import com.aug.elevter.model.EdgeSeedFloor;
+import com.aug.elevter.model.Elevter.MoveStatus;
 import com.aug.elevter.model.Seed;
 
 import java.util.ArrayList;
 
+/**
+ * 楼层数从0开始
+ *
+ */
 public class SeedsOnFloorCollect {
 
     private int floorSize = 0;
@@ -24,12 +29,18 @@ public class SeedsOnFloorCollect {
         list.add(seed);
     }
     
-    public ArrayList<Seed> takeSeeds(int floor, int elevterId) {
+    public ArrayList<Seed> takeSeeds(int floor, int elevterId, MoveStatus moveStatus) {
+
+        boolean elevterIdle = moveStatus == MoveStatus.IDLE;
+        boolean elevterGoUp = moveStatus == MoveStatus.UP;
+        boolean elevterGoDown = moveStatus == MoveStatus.DOWN;
+        
         ArrayList<Seed> taken = new ArrayList<Seed>();
         ArrayList<Seed> list = getSeedsListAt(floor);
         for (int i = list.size() - 1; i >= 0; i--) {
             Seed seed = list.get(i);
-            if (seed.getMarkElevterId() == elevterId) {
+            boolean sameDir = elevterIdle || (elevterGoUp && !seed.isDown()) || (elevterGoDown && seed.isDown());
+            if (seed.getMarkElevterId() == elevterId && sameDir) {
                 taken.add(list.remove(i));
             }
         }
@@ -65,6 +76,14 @@ public class SeedsOnFloorCollect {
     private void resetStepCost(ArrayList<Seed> list) {
         for (Seed seed : list) {
             seed.clearMarkElevterId();
+        }
+    }
+    
+    public void getTopBottomSeedFloor(EdgeSeedFloor edgeFloor) {
+        for (int i = 0; i < floorSize; i++) {
+            if (getSeedsListAt(i).size() > 0) {
+                edgeFloor.setFloor(i + 1);
+            }
         }
     }
 }

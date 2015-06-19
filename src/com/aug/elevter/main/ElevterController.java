@@ -1,5 +1,6 @@
 package com.aug.elevter.main;
 
+import com.aug.elevter.model.EdgeSeedFloor;
 import com.aug.elevter.model.Elevter;
 import com.aug.elevter.model.Seed;
 import com.aug.elevter.model.collect.ElevterCollect;
@@ -43,15 +44,15 @@ public class ElevterController extends TimerTask {
     @Override
     public void run() {
         LogUtils.d("run time = " + runTimeCountLog);
-        if (runTimeCountLog == 40) {
+        if (runTimeCountLog == 45) {
             int debug = runTimeCountLog;
             debug++;
         }
 
-        int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
-        LogUtils.d("   process elevterCollect. wait count = " + waitingSeedCount);
-        
         if (shouldContinue()) {
+            int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
+            LogUtils.d("   process elevterCollect. wait count = " + waitingSeedCount);
+            
             Seed seed = reader.getNext();
             if (seed != null) {
                 onProcessSeed(seed);
@@ -77,75 +78,71 @@ public class ElevterController extends TimerTask {
     private void onProcessElevterNextStep() {
         int elevterCount = elevterCollect.getSize();
         
-        // 1. 电梯停在某楼层
+        // 1. 清除电梯所在楼层seeds的stepCost
+        seedsOnFloorCollect.clearAllStepCost();
+
+        EdgeSeedFloor edgeFloor = new EdgeSeedFloor();
+        seedsOnFloorCollect.getTopBottomSeedFloor(edgeFloor);
+        
+        // 2. 标记空载的电梯，如果没有目标seed，将要停下
         for (int i = 0; i < elevterCount; i++) {
             Elevter elevter = elevterCollect.get(i);
-            elevter.onStopAtFloor();
+            elevter.preSetActive(edgeFloor);
         }
         
-//        // 2. 获取所有电梯所在楼层
-//        HashMap<Integer, Object> elevterAtFloor = new HashMap<Integer, Object>();
-//        for (int i = 0; i < elevterCount; i++) {
-//            Elevter elevter = elevterCollect.get(i);
-//            elevterAtFloor.put(elevter.getCurrentFloor(), new Object());
-//        }
-        
-        // 3. 清除电梯所在楼层seeds的stepCost
-//        for (Integer floor : elevterAtFloor.keySet()) {
-//            resetStepCost(seedsOnFloorCollect.getSeedsListAt(floor));
-//        }
-        seedsOnFloorCollect.clearAllStepCost();
-        
-        // 4. 更新电梯所在楼层seeds的stepCost
-//        for (int i = 0; i < elevterCount; i++) {
-//            Elevter elevter = elevterCollect.get(i);
-//            for (Integer floor : elevterAtFloor.keySet()) {
-//                elevter.preHandleSeeds(floor, seedsOnFloorCollect.getSeedsListAt(floor));
-//            }
-//        }
-        // 4. 更新所有楼层seeds的stepCost
+        // 3. 更新所有楼层seeds的stepCost
         for (int i = 0; i < elevterCount; i++) {
             Elevter elevter = elevterCollect.get(i);
             int totalFloorSize = seedsOnFloorCollect.getFloorSize();
             for (int floor = 0; floor < totalFloorSize; floor++) {
-                elevter.preHandleSeeds(floor + 1, seedsOnFloorCollect.getSeedsListAt(floor));
+                elevter.preHandleSeeds(floor + 1, 
+                        seedsOnFloorCollect.getSeedsListAt(floor),
+                        edgeFloor.getTop(),
+                        edgeFloor.getBottom());
             }
         }
         
-        // 5. 检查seeds，如果对应的电梯是idle状态，把电梯启动
+//        int totalFloorSize = seedsOnFloorCollect.getFloorSize();
+//        for (int floor = 0; floor < totalFloorSize; floor++) {
+//            ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
+//            for (Seed seed : list) {
+//                int seedAtFloor = seed.getFloor();
+//                int elevterId = seed.getMarkElevterId();
+//                elevterId--;
+//                if (elevterId < 0 || elevterId >= elevterCount) {
+////                    LogUtils.e("!!! error !!! wrong elevterId = " + elevterId);
+//                } else {
+//                    Elevter elevter = elevterCollect.get(elevterId);
+//                    elevter.setActive(seedAtFloor);
+//                }
+//            }
+//        }
+//        for (int i = 0; i < elevterCount; i++) {
+//            Elevter elevter = elevterCollect.get(i);
+//            elevter.checkActive(false);
+//        }
+
+        // 4. 停下空载的电梯
         for (int i = 0; i < elevterCount; i++) {
             Elevter elevter = elevterCollect.get(i);
-            elevter.checkActive(true);
-        }
-        int totalFloorSize = seedsOnFloorCollect.getFloorSize();
-        for (int floor = 0; floor < totalFloorSize; floor++) {
-            ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
-            for (Seed seed : list) {
-                int seedAtFloor = seed.getFloor();
-                int elevterId = seed.getMarkElevterId();
-                elevterId--;
-                if (elevterId < 0 || elevterId >= elevterCount) {
-//                    LogUtils.e("!!! error !!! wrong elevterId = " + elevterId);
-                } else {
-                    Elevter elevter = elevterCollect.get(elevterId);
-                    elevter.setActive(seedAtFloor);
-                }
-            }
-        }
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            elevter.checkActive(false);
+            elevter.setActiveIdle();
         }
         
-        // 6. 电梯载人，走向下一个楼层
+        // 5. 电梯载人，走向下一个楼层
         for (int i = 0; i < elevterCount; i++) {
             Elevter elevter = elevterCollect.get(i);
             int floor = elevter.getCurrentFloor();
             int id = elevter.getId();
-            ArrayList<Seed> newSeeds = seedsOnFloorCollect.takeSeeds(floor - 1, id);
+            ArrayList<Seed> newSeeds = seedsOnFloorCollect.takeSeeds(floor - 1, id, elevter.getMoveStatus());
             
             elevter.takeSeeds(newSeeds);
             elevter.gotoNextFloor();
+        }
+
+        // 6. 电梯停在某楼层
+        for (int i = 0; i < elevterCount; i++) {
+            Elevter elevter = elevterCollect.get(i);
+            elevter.onStopAtFloor();
         }
     }
     

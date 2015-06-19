@@ -9,14 +9,10 @@ public class Constants {
     // 楼层数
     public static final int totalFloor = 24;
     // 每个电梯载人量
-    public static int elevterLoadCapacity = 10;
-
+    public static final int elevterLoadCapacity = 10;
 
     // 单位时长(ms)
     public static final int timeSlot = 1;
-    
-    public static final String DIR_UP = "UP";
-    public static final String DIR_DOWN = "DOWN";
     
     public static final String seedFilePath = "./seeds.txt";
     

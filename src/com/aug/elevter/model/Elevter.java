@@ -7,13 +7,17 @@ import com.aug.elevter.tools.LogUtils;
 
 import java.util.ArrayList;
 
+/**
+ * 楼层数从1开始
+ *
+ */
 public class Elevter {
 
     public enum MoveStatus {
-        UP, DOWN, IDLE, PRE_IDLE_UP, PRE_IDLE_DOWN,
+        UP, DOWN, IDLE, PRE_UP, PRE_DOWN,
     }
 
-    private int totalStep = 0;
+    private int totalStep = 0;  // 总共走了几步
     private int totalLoad = 0;  // 总负载
 
     private int id = 0;
@@ -31,7 +35,7 @@ public class Elevter {
         this.id = id;
     }
 
-    public int getCurrentLoad() {
+    private int getCurrentLoad() {
         return loadSeeds != null ? loadSeeds.size() : 0;
     }
 
@@ -54,11 +58,11 @@ public class Elevter {
         return currentFloor;
     }
 
-    private boolean isGetTop() {
+    private boolean isReachTop() {
         return currentFloor == topFloor && moveStatus == MoveStatus.UP;
     }
 
-    private boolean isGetBottom() {
+    private boolean isReachBottom() {
         return currentFloor == bottomFloor && moveStatus == MoveStatus.DOWN;
     }
 
@@ -76,8 +80,9 @@ public class Elevter {
      * @param floor 实际楼层数。从1开始
      * @param seedsListAtFloor
      */
-    public void preHandleSeeds(int floor, ArrayList<Seed> seedsListAtFloor) {
-        elevterPolicy.takeSeed(this, floor, seedsListAtFloor);
+    public void preHandleSeeds(int floor, ArrayList<Seed> seedsListAtFloor,
+            int topFloor, int bottomFloor) {
+        elevterPolicy.preHandleSeeds(this, floor, seedsListAtFloor, topFloor, bottomFloor);
     }
 
     private void releaseSeeds() {
@@ -101,7 +106,7 @@ public class Elevter {
 
     public void gotoNextFloor() {
         if (moveStatus == MoveStatus.DOWN) {
-            if (isGetBottom()) {
+            if (isReachBottom()) {
                 moveStatus = MoveStatus.IDLE;
             } else {
                 currentFloor--;
@@ -111,7 +116,7 @@ public class Elevter {
                         totalStep, totalLoad));
             }
         } else if (moveStatus == MoveStatus.UP) {
-            if (isGetTop()) {
+            if (isReachTop()) {
                 moveStatus = MoveStatus.IDLE;
             } else {
                 currentFloor++;
@@ -123,39 +128,46 @@ public class Elevter {
         }
     }
 
-    public void setActive(int gotoFloor) {
-        boolean setted = false;
-        if (moveStatus == MoveStatus.PRE_IDLE_DOWN && currentFloor > gotoFloor) {
-            moveStatus = MoveStatus.DOWN;
-            setted = true;
-        } else if (moveStatus == MoveStatus.PRE_IDLE_UP && currentFloor < gotoFloor) {
-            moveStatus = MoveStatus.UP;
-            setted = true;
-        } else if (moveStatus == MoveStatus.IDLE && currentFloor != gotoFloor) {
-            moveStatus = currentFloor > gotoFloor ? MoveStatus.DOWN : MoveStatus.UP;
-            setted = true;
-        } else if (currentFloor == gotoFloor && 
-                (moveStatus == MoveStatus.PRE_IDLE_DOWN || moveStatus == MoveStatus.PRE_IDLE_UP)) {
-            moveStatus = moveStatus == MoveStatus.PRE_IDLE_DOWN ? MoveStatus.DOWN : MoveStatus.UP;
-            setted = true;
-        }
-
-        if (setted) {
-            LogUtils.d(String.format("   [ACTIVE] elevter #%d# from %d to %d", id, currentFloor, gotoFloor));
+    public void preSetActive(EdgeSeedFloor edgeFloor) {
+        if (getCurrentLoad() == 0) {
+            if (currentFloor >= edgeFloor.getTop() || 
+                    currentFloor <= edgeFloor.getBottom()) {
+                moveStatus = MoveStatus.IDLE;
+            } else if (moveStatus == MoveStatus.DOWN) {
+                moveStatus = MoveStatus.PRE_DOWN;
+            } else if (moveStatus == MoveStatus.UP) {
+                moveStatus = MoveStatus.PRE_UP;
+            }
         }
     }
+    
+    public void setActive(int atFloor, int gotoFloor) {
+      boolean setted = false;
+      if (moveStatus == MoveStatus.IDLE) {
+          if (currentFloor != atFloor) {
+              moveStatus = currentFloor > atFloor ? MoveStatus.DOWN : MoveStatus.UP;
+              setted = true;
+          } else {
+              moveStatus = currentFloor > gotoFloor ? MoveStatus.DOWN : MoveStatus.UP;
+              setted = true;
+          }
+      } else if (moveStatus == MoveStatus.PRE_DOWN && currentFloor > atFloor) {
+          moveStatus = MoveStatus.DOWN;
+          setted = true;
+      } else if (moveStatus == MoveStatus.PRE_UP && currentFloor < atFloor) {
+          moveStatus = MoveStatus.UP;
+          setted = true;
+      }
 
-    public void checkActive(boolean beginCheck) {
-        if (getCurrentLoad() == 0) {
-            if (beginCheck) {
-                if (moveStatus == MoveStatus.DOWN) {
-                    moveStatus = MoveStatus.PRE_IDLE_DOWN;
-                } else if (moveStatus == MoveStatus.UP) {
-                    moveStatus = MoveStatus.PRE_IDLE_UP;
-                }
-            } else if (moveStatus == MoveStatus.PRE_IDLE_DOWN || moveStatus == MoveStatus.PRE_IDLE_UP) {
-                moveStatus = MoveStatus.IDLE;
-            }
+      if (setted) {
+          LogUtils.d(String.format("   [ACTIVE] elevter #%d# from %d to %d", id, currentFloor, atFloor));
+      }
+    }
+    
+    public void setActiveIdle() {
+        if (getCurrentLoad() == 0 &&
+                (moveStatus == MoveStatus.PRE_DOWN || moveStatus == MoveStatus.PRE_UP)) {
+            moveStatus = MoveStatus.IDLE;
         }
     }
 

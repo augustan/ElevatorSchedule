@@ -5,8 +5,15 @@ import com.aug.elevter.tools.LogUtils;
 
 import java.util.Random;
 
+/**
+ * 楼层数从1开始
+ *
+ */
 public class Seed {
 
+    private static final String DIR_UP = "UP";
+    private static final String DIR_DOWN = "DOWN";
+    
     // ID. 楼层   上/下按钮   要去几层    读取下一条数据间隔时间  
     private static final String seedLineFormat = "%d,%d,%s,%d,%d";
     
@@ -63,13 +70,13 @@ public class Seed {
     
     public String toString() {
         String record = String.format(seedLineFormat, id, floor,
-                isDown ? Constants.DIR_DOWN : Constants.DIR_UP, toFloor, waitTime);
+                isDown ? DIR_DOWN : DIR_UP, toFloor, waitTime);
         return record;
     }
     
     public String toDumpString() {
         String record = String.format("[%d]: from %d %s to %d, after %d", id, floor,
-                isDown ? Constants.DIR_DOWN : Constants.DIR_UP, toFloor, waitTime);
+                isDown ? DIR_DOWN : DIR_UP, toFloor, waitTime);
         return record;
     }
 
