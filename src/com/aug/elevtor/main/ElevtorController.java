@@ -1,24 +1,24 @@
-package com.aug.elevter.main;
+package com.aug.elevtor.main;
 
-import com.aug.elevter.model.EdgeSeedFloor;
-import com.aug.elevter.model.Elevter;
-import com.aug.elevter.model.Seed;
-import com.aug.elevter.model.Statistic;
-import com.aug.elevter.model.collect.ElevterCollect;
-import com.aug.elevter.model.collect.SeedsOnFloorCollect;
-import com.aug.elevter.tools.LogUtils;
-import com.aug.elevter.tools.SeedsReader;
+import com.aug.elevtor.model.EdgeSeedFloor;
+import com.aug.elevtor.model.Elevtor;
+import com.aug.elevtor.model.Seed;
+import com.aug.elevtor.model.Statistic;
+import com.aug.elevtor.model.collect.ElevtorCollect;
+import com.aug.elevtor.model.collect.SeedsOnFloorCollect;
+import com.aug.elevtor.tools.LogUtils;
+import com.aug.elevtor.tools.SeedsReader;
 
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ElevterController extends TimerTask {
+public class ElevtorController extends TimerTask {
     
     private Timer globalTimer;
     private SeedsReader reader = null;
     
-    private ElevterCollect elevterCollect;
+    private ElevtorCollect elevtorCollect;
     private SeedsOnFloorCollect seedsOnFloorCollect;
     
     public void init() {
@@ -26,7 +26,7 @@ public class ElevterController extends TimerTask {
         reader.init();
         globalTimer = new Timer(true);
         
-        elevterCollect = new ElevterCollect(Constants.elevterCount);
+        elevtorCollect = new ElevtorCollect(Constants.elevtorCount);
         seedsOnFloorCollect = new SeedsOnFloorCollect(Constants.totalFloor);
     }
     
@@ -37,7 +37,7 @@ public class ElevterController extends TimerTask {
     private boolean shouldContinue() {
         int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
         return reader.getRemainSeedCount() > 0 || waitingSeedCount > 0 ||
-        !isAllElevterIdle();
+        !isAllElevtorIdle();
     }
     
     @Override
@@ -51,13 +51,13 @@ public class ElevterController extends TimerTask {
 
         if (shouldContinue()) {
             int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
-            LogUtils.d("   process elevterCollect. wait count = " + waitingSeedCount);
+            LogUtils.d("   process elevtorCollect. wait count = " + waitingSeedCount);
             
             Seed seed = reader.getNext();
             if (seed != null) {
                 onProcessSeed(seed);
             }
-            onProcessElevterNextStep();
+            onProcessElevtorNextStep();
             dumpCurrentStatus();
         } else {
             globalTimer.cancel();
@@ -74,8 +74,8 @@ public class ElevterController extends TimerTask {
         seedsOnFloorCollect.add(seed.getFloor() - 1, seed);
     }
 
-    private void onProcessElevterNextStep() {
-        int elevterCount = elevterCollect.getSize();
+    private void onProcessElevtorNextStep() {
+        int elevtorCount = elevtorCollect.getSize();
         
         // 1. 清除电梯所在楼层seeds的stepCost
         seedsOnFloorCollect.clearAllStepCost();
@@ -84,17 +84,17 @@ public class ElevterController extends TimerTask {
         seedsOnFloorCollect.getTopBottomSeedFloor(edgeFloor);
         
         // 2. 标记空载的电梯，如果没有目标seed，将要停下
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            elevter.preSetActive(edgeFloor);
+        for (int i = 0; i < elevtorCount; i++) {
+            Elevtor elevtor = elevtorCollect.get(i);
+            elevtor.preSetActive(edgeFloor);
         }
         
         // 3. 更新所有楼层seeds的stepCost
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
+        for (int i = 0; i < elevtorCount; i++) {
+            Elevtor elevtor = elevtorCollect.get(i);
             int totalFloorSize = seedsOnFloorCollect.getFloorSize();
             for (int floor = 0; floor < totalFloorSize; floor++) {
-                elevter.preHandleSeeds(floor + 1, 
+                elevtor.preHandleSeeds(floor + 1, 
                         seedsOnFloorCollect.getSeedsListAt(floor),
                         edgeFloor.getTop(),
                         edgeFloor.getBottom());
@@ -106,73 +106,73 @@ public class ElevterController extends TimerTask {
 //            ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
 //            for (Seed seed : list) {
 //                int seedAtFloor = seed.getFloor();
-//                int elevterId = seed.getMarkElevterId();
-//                elevterId--;
-//                if (elevterId < 0 || elevterId >= elevterCount) {
-////                    LogUtils.e("!!! error !!! wrong elevterId = " + elevterId);
+//                int elevtorId = seed.getMarkElevtorId();
+//                elevtorId--;
+//                if (elevtorId < 0 || elevtorId >= elevtorCount) {
+////                    LogUtils.e("!!! error !!! wrong elevtorId = " + elevtorId);
 //                } else {
-//                    Elevter elevter = elevterCollect.get(elevterId);
-//                    elevter.setActive(seedAtFloor);
+//                    Elevtor elevtor = elevtorCollect.get(elevtorId);
+//                    elevtor.setActive(seedAtFloor);
 //                }
 //            }
 //        }
-//        for (int i = 0; i < elevterCount; i++) {
-//            Elevter elevter = elevterCollect.get(i);
-//            elevter.checkActive(false);
+//        for (int i = 0; i < elevtorCount; i++) {
+//            Elevtor elevtor = elevtorCollect.get(i);
+//            elevtor.checkActive(false);
 //        }
 
         // 4. 停下空载的电梯
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            elevter.setActiveIdle();
+        for (int i = 0; i < elevtorCount; i++) {
+            Elevtor elevtor = elevtorCollect.get(i);
+            elevtor.setActiveIdle();
         }
         
         // 5. 电梯载人，走向下一个楼层
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            int floor = elevter.getCurrentFloor();
-            int id = elevter.getId();
-            ArrayList<Seed> newSeeds = seedsOnFloorCollect.takeSeeds(floor - 1, id, elevter.getMoveStatus());
+        for (int i = 0; i < elevtorCount; i++) {
+            Elevtor elevtor = elevtorCollect.get(i);
+            int floor = elevtor.getCurrentFloor();
+            int id = elevtor.getId();
+            ArrayList<Seed> newSeeds = seedsOnFloorCollect.takeSeeds(floor - 1, id, elevtor.getMoveStatus());
             
-            elevter.takeSeeds(newSeeds);
-            elevter.gotoNextFloor();
+            elevtor.takeSeeds(newSeeds);
+            elevtor.gotoNextFloor();
         }
 
         // 6. 电梯停在某楼层
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            elevter.onStopAtFloor();
+        for (int i = 0; i < elevtorCount; i++) {
+            Elevtor elevtor = elevtorCollect.get(i);
+            elevtor.onStopAtFloor();
         }
     }
     
-    private boolean isAllElevterIdle() {
+    private boolean isAllElevtorIdle() {
         int idleCnt = 0;
-        int elevterCount = elevterCollect.getSize();
-        for (int i = 0; i < elevterCount; i++) {
-            Elevter elevter = elevterCollect.get(i);
-            if (elevter.isIdle()) {
+        int elevtorCount = elevtorCollect.getSize();
+        for (int i = 0; i < elevtorCount; i++) {
+            Elevtor elevtor = elevtorCollect.get(i);
+            if (elevtor.isIdle()) {
                 idleCnt++;
             }
         }
-        return idleCnt == elevterCount;
+        return idleCnt == elevtorCount;
     }
     
-//    private int getTotalElevterStep() {
+//    private int getTotalElevtorStep() {
 //        int step = 0;
-//        int elevterCount = elevterCollect.getSize();
-//        for (int i = 0; i < elevterCount; i++) {
-//            Elevter elevter = elevterCollect.get(i);
-//            step += elevter.getTotalStep();
+//        int elevtorCount = elevtorCollect.getSize();
+//        for (int i = 0; i < elevtorCount; i++) {
+//            Elevtor elevtor = elevtorCollect.get(i);
+//            step += elevtor.getTotalStep();
 //        }
 //        return step;
 //    }
 //
-//    private int getTotalElevterLoad() {
+//    private int getTotalElevtorLoad() {
 //        int load = 0;
-//        int elevterCount = elevterCollect.getSize();
-//        for (int i = 0; i < elevterCount; i++) {
-//            Elevter elevter = elevterCollect.get(i);
-//            load += elevter.getTotalLoad();
+//        int elevtorCount = elevtorCollect.getSize();
+//        for (int i = 0; i < elevtorCount; i++) {
+//            Elevtor elevtor = elevtorCollect.get(i);
+//            load += elevtor.getTotalLoad();
 //        }
 //        return load;
 //    }

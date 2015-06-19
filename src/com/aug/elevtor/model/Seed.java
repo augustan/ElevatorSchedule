@@ -1,7 +1,7 @@
-package com.aug.elevter.model;
+package com.aug.elevtor.model;
 
-import com.aug.elevter.main.Constants;
-import com.aug.elevter.tools.LogUtils;
+import com.aug.elevtor.main.Constants;
+import com.aug.elevtor.tools.LogUtils;
 
 import java.util.Random;
 
@@ -26,7 +26,7 @@ public class Seed {
     private int waitTime = 0;
     private int curWaitTime = 0;
     
-    private int markElevterId = -1;
+    private int markElevtorId = -1;
     private int minStepCost = Integer.MAX_VALUE;
     
     private int beginTime = 0;    // 开始等待的时间。统计用
@@ -38,7 +38,7 @@ public class Seed {
     
     public Seed(int id) {
         this.id = id;
-        int maxWaitTime = Constants.totalFloor / Constants.elevterCount;
+        int maxWaitTime = Constants.totalFloor / Constants.elevtorCount;
         if (maxWaitTime <= 0) {
             maxWaitTime = 1;
         }
@@ -108,21 +108,21 @@ public class Seed {
         this.curWaitTime = waitTime;
     }
     
-    public int getMarkElevterId() {
-        return markElevterId;
+    public int getMarkElevtorId() {
+        return markElevtorId;
     }
     
-    public void clearMarkElevterId() {
+    public void clearMarkElevtorId() {
         minStepCost = Integer.MAX_VALUE;
-        markElevterId = -1;
-        LogUtils.d("   [SEED] clear ElevterId");
+        markElevtorId = -1;
+        LogUtils.d("   [SEED] clear ElevtorId");
     }
     
-    public void setMarkElevterId(int markElevterId, int stepCost) {
+    public void setMarkElevtorId(int markElevtorId, int stepCost) {
         if (stepCost < minStepCost) {
             minStepCost = stepCost;
-            this.markElevterId = markElevterId;
-            LogUtils.d("   [SEED] " + this.toDumpString() + " set ElevterId = " + markElevterId);
+            this.markElevtorId = markElevtorId;
+            LogUtils.d("   [SEED] " + this.toDumpString() + " set ElevtorId = " + markElevtorId);
         }
     }
     

@@ -1,6 +1,6 @@
-package com.aug.elevter.main;
+package com.aug.elevtor.main;
 
-import com.aug.elevter.model.Seed;
+import com.aug.elevtor.model.Seed;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

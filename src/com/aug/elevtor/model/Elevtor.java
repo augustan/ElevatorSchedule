@@ -1,9 +1,9 @@
-package com.aug.elevter.model;
+package com.aug.elevtor.model;
 
-import com.aug.elevter.main.Constants;
-import com.aug.elevter.policy.ElevterPolicy;
-import com.aug.elevter.policy.StandardPolicy;
-import com.aug.elevter.tools.LogUtils;
+import com.aug.elevtor.main.Constants;
+import com.aug.elevtor.policy.ElevtorPolicy;
+import com.aug.elevtor.policy.StandardPolicy;
+import com.aug.elevtor.tools.LogUtils;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 楼层数从1开始
  *
  */
-public class Elevter {
+public class Elevtor {
 
     public enum MoveStatus {
         UP, DOWN, IDLE, PRE_UP, PRE_DOWN,
@@ -21,17 +21,17 @@ public class Elevter {
     private int totalLoad = 0;  // 总负载
 
     private int id = 0;
-    private int maxLoad = Constants.elevterLoadCapacity;
+    private int maxLoad = Constants.elevtorLoadCapacity;
     private int topFloor = Constants.totalFloor;
     private int bottomFloor = 1;
 
     private MoveStatus moveStatus = MoveStatus.IDLE;
-    private ElevterPolicy elevterPolicy = new StandardPolicy();
+    private ElevtorPolicy elevtorPolicy = new StandardPolicy();
 
     private ArrayList<Seed> loadSeeds = new ArrayList<Seed>();
     private int currentFloor = bottomFloor;
 
-    public Elevter(int id) {
+    public Elevtor(int id) {
         this.id = id;
     }
 
@@ -82,7 +82,7 @@ public class Elevter {
      */
     public void preHandleSeeds(int floor, ArrayList<Seed> seedsListAtFloor,
             int topFloor, int bottomFloor) {
-        elevterPolicy.preHandleSeeds(this, floor, seedsListAtFloor, topFloor, bottomFloor);
+        elevtorPolicy.preHandleSeeds(this, floor, seedsListAtFloor, topFloor, bottomFloor);
     }
 
     private void releaseSeeds() {
@@ -164,7 +164,7 @@ public class Elevter {
       }
 
       if (setted) {
-          LogUtils.d(String.format("   [ACTIVE] elevter #%d# from %d to %d", id, currentFloor, atFloor));
+          LogUtils.d(String.format("   [ACTIVE] elevtor #%d# from %d to %d", id, currentFloor, atFloor));
       }
     }
     
