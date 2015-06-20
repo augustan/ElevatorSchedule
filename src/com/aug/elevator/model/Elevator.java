@@ -108,7 +108,7 @@ public class Elevator {
     
     private void setMoveStatus(MoveStatus status) {
         if (moveStatus != status) {
-            LogUtils.d(String.format("   [STATUS] #%d# from %s to %s", id, moveStatus, status));
+            LogUtils.d(String.format("   [STATUS] #%d# from %s to %s, at floor = %d", id, moveStatus, status, currentFloor));
             moveStatus = status;
         }
     }
@@ -122,7 +122,7 @@ public class Elevator {
                 totalStep++;
                 totalLoad += getCurrentLoad();
                 Statistic.onMove(this);
-                LogUtils.e(String.format("   [MOVE] #%d# move down at %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
+                LogUtils.e(String.format("   [MOVE] #%d# move down arrive floor = %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
                         totalStep, totalLoad, getCurrentLoad()));
             }
         } else if (moveStatus == MoveStatus.UP) {
@@ -133,7 +133,7 @@ public class Elevator {
                 totalStep++;
                 totalLoad += getCurrentLoad();
                 Statistic.onMove(this);
-                LogUtils.e(String.format("   [MOVE] #%d# move up at %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
+                LogUtils.e(String.format("   [MOVE] #%d# move up arrive floor = %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
                         totalStep, totalLoad, getCurrentLoad()));
             }
         }
@@ -176,7 +176,7 @@ public class Elevator {
       }
 
       if (setted) {
-          LogUtils.d(String.format("   [ACTIVE] elevator #%d# from %d to %d", id, currentFloor, seedAtFloor));
+          LogUtils.d(String.format("   [ACTIVE] elevator #%d# from floor %d to %d", id, currentFloor, seedAtFloor));
       }
     }
     
