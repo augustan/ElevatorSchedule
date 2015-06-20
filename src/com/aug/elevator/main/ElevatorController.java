@@ -14,6 +14,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ElevatorController {
+    
+    private boolean enableDumpAllStatus = true;
 
     private Timer globalTimer;
     private SeedsReader reader = null;
@@ -71,8 +73,7 @@ public class ElevatorController {
                 onProcessSeed(seed);
             }
             onProcessElevatorNextStep();
-            dumpCurrentStatus();
-            
+
             if (callback != null) {
                 callback.onOneStep();
             }
@@ -111,6 +112,7 @@ public class ElevatorController {
         int elevatorCount = elevatorCollect.getSize();
 
         // 1. 清除电梯所在楼层seeds的stepCost
+        LogUtils.d("   [CONTROL] clear all seeds' ElevatorId");
         seedsOnFloorCollect.clearAllStepCost();
 
         EdgeSeedFloor edgeFloor = new EdgeSeedFloor();
@@ -132,7 +134,7 @@ public class ElevatorController {
             }
         }
 
-        // 4. 便利所有seed，启动有相应标记的电梯
+        // 4. 遍历所有seed，启动有相应标记的电梯
         int totalFloorSize = seedsOnFloorCollect.getFloorSize();
         for (int floor = 0; floor < totalFloorSize; floor++) {
             ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
@@ -153,6 +155,8 @@ public class ElevatorController {
             Elevator elevator = elevatorCollect.get(i);
             elevator.setActiveIdle();
         }
+        
+        dumpCurrentStatus();
 
         // 6. 电梯载人，走向下一个楼层
         for (int i = 0; i < elevatorCount; i++) {
@@ -205,6 +209,24 @@ public class ElevatorController {
 //    }
 
     private void dumpCurrentStatus() {
+        if (enableDumpAllStatus) {
+            LogUtils.e("[DUMP START] =================== [DUMP START]");
+            
+            int elevatorCount = elevatorCollect.getSize();
+            for (int id = 0; id < elevatorCount; id++) {
+                Elevator elevator = elevatorCollect.get(id);
+                LogUtils.e("   [DUMP] [ELEVATOR] " + elevator.toDumpString());
+            }
+            
+            int totalFloorSize = seedsOnFloorCollect.getFloorSize();
+            for (int floor = 0; floor < totalFloorSize; floor++) {
+                ArrayList<Seed> list = seedsOnFloorCollect.getSeedsListAt(floor);
+                for (Seed seed : list) {
+                    LogUtils.e("   [DUMP] [WAITING SEED] " + seed.toDumpString());
+                }
+            }
 
+            LogUtils.e("[DUMP END] =================== [DUMP END]");
+        }
     }
 }

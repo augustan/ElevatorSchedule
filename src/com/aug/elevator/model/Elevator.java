@@ -198,4 +198,20 @@ public class Elevator {
     public int getTotalLoad() {
         return totalLoad;
     }
+
+    public String toDumpString() {
+        StringBuilder sb = new StringBuilder();
+        String record = String.format("#%d#:[at floor %d %s, load = %d. totalStep = %d, totalLoad = %d]", id, currentFloor,
+                moveStatus, getCurrentLoad(), totalStep, totalLoad);
+        sb.append(record);
+        sb.append("\n");
+        sb.append(String.format("      [DUMP] [TAKEING] %d SEEDS: \n", getCurrentLoad()));
+        for (Seed seed : loadSeeds) {
+            sb.append("      [DUMP] [TAKEING] ");
+            sb.append(seed.toDumpString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

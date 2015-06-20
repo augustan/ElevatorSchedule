@@ -79,8 +79,8 @@ public class Seed {
     }
     
     public String toDumpString() {
-        String record = String.format("#%d#:[from %d %s to %d, after %d]", id, floor,
-                isDown ? DIR_DOWN : DIR_UP, toFloor, waitTime);
+        String record = String.format("#%d#:[from %d %s to %d, after %d, waiting elevator #%d#]", id, floor,
+                isDown ? DIR_DOWN : DIR_UP, toFloor, waitTime, markElevatorId);
         return record;
     }
 
@@ -115,7 +115,6 @@ public class Seed {
     public void clearMarkElevatorId() {
         minStepCost = Integer.MAX_VALUE;
         markElevatorId = -1;
-        LogUtils.d("   [SEED] clear ElevatorId");
     }
     
     public void setMarkElevatorId(int markElevatorId, int stepCost) {

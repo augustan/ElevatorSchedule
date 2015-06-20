@@ -3,6 +3,9 @@ package com.aug.elevator.model;
 import com.aug.elevator.tools.LogUtils;
 
 public class Statistic {
+
+    private static int seedCount = 0; // seed总数
+    private static int minLoad = 0;   // 根据seed的属性计算出的最小消耗
     
     private static int timeTickTack = 0;
     private static int totalStep = 0;  // 总移动步数
@@ -25,7 +28,9 @@ public class Statistic {
      * 首次出现
      */
     public static void onShowNewSeed(Seed seed) {
+        seedCount++;
         seed.setBeginTime(timeTickTack);
+        minLoad += Math.abs(seed.getFloor() - seed.getToFloor());
     }
     
     /**
@@ -45,10 +50,12 @@ public class Statistic {
     }
     
     public static void showResule() {
-      LogUtils.d("! [Statistic] timeTick = " + timeTickTack);
-      LogUtils.d("! [Statistic] totalStep = " + totalStep);
-      LogUtils.d("! [Statistic] totalLoad = " + totalLoad);
-      LogUtils.d("! [Statistic] totalWaitTime = " + totalWaitTime);
-      LogUtils.d("! [Statistic] totalSpendTime = " + totalSpendTime);
+        LogUtils.d("! [Statistic] seedCount = " + seedCount);
+        LogUtils.d("! [Statistic] minLoad = " + minLoad);
+        LogUtils.d("! [Statistic] timeTick = " + timeTickTack);
+        LogUtils.d("! [Statistic] totalStep = " + totalStep);
+        LogUtils.d("! [Statistic] totalLoad = " + totalLoad);
+        LogUtils.d("! [Statistic] totalWaitTime = " + totalWaitTime);
+        LogUtils.d("! [Statistic] totalSpendTime = " + totalSpendTime);
     }
 }
