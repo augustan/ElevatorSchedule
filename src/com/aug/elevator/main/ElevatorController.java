@@ -13,35 +13,48 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ElevatorController extends TimerTask {
-    
+public class ElevatorController {
+
     private Timer globalTimer;
     private SeedsReader reader = null;
-    
+
     private ElevatorCollect elevatorCollect;
     private SeedsOnFloorCollect seedsOnFloorCollect;
     
-    public void init() {
+    private boolean runUntilFinish = true;
+    private ElevatorRunCallback callback = null;
+
+    private TimerTask stepTimerTask = new TimerTask() {
+        @Override
+        public void run() {
+            runOneStep();
+        }
+    };
+
+    public void init(boolean runUntilFinish, ElevatorRunCallback callback) {
+        this.runUntilFinish = runUntilFinish;
+        this.callback = callback;
+
         reader = new SeedsReader();
         reader.init();
-        globalTimer = new Timer(true);
-        
+
         elevatorCollect = new ElevatorCollect(Constants.elevatorCount);
         seedsOnFloorCollect = new SeedsOnFloorCollect(Constants.totalFloor);
     }
-    
+
     public void start() {
-        globalTimer.scheduleAtFixedRate(this, 0, Constants.timeSlot);
+        if (runUntilFinish) {
+            if (globalTimer == null) {
+                globalTimer = new Timer(true);
+                globalTimer.scheduleAtFixedRate(stepTimerTask, 0, Constants.timeSlot);
+            }
+        } else {
+            runOneStep();
+        }
     }
-    
-    private boolean shouldContinue() {
-        int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
-        return reader.getRemainSeedCount() > 0 || waitingSeedCount > 0 ||
-        !isAllElevatorIdle();
-    }
-    
-    @Override
-    public void run() {
+
+    private boolean runOneStep() {
+        boolean finish = false;
         int timeCount = Statistic.onTimeLapse();
         LogUtils.d("run time = " + timeCount);
         if (timeCount == 18) {
@@ -52,20 +65,40 @@ public class ElevatorController extends TimerTask {
         if (shouldContinue()) {
             int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
             LogUtils.d("   process elevatorCollect. wait count = " + waitingSeedCount);
-            
+
             Seed seed = reader.getNext();
             if (seed != null) {
                 onProcessSeed(seed);
             }
             onProcessElevatorNextStep();
             dumpCurrentStatus();
-        } else {
-            globalTimer.cancel();
-            Statistic.showResule();
-            synchronized (this) {
-                this.notifyAll();
+            
+            if (callback != null) {
+                callback.onOneStep();
             }
+        } else {
+            finish = true;
+            onFinish();
         }
+        return finish;
+    }
+
+    private void onFinish() {
+        Statistic.showResule();
+        
+        if (globalTimer != null) {
+            globalTimer.cancel();
+            globalTimer = null;
+        }
+
+        if (callback != null) {
+            callback.onFinish();
+        }
+    }
+
+    private boolean shouldContinue() {
+        int waitingSeedCount = seedsOnFloorCollect.getWaitingSeedCount();
+        return reader.getRemainSeedCount() > 0 || waitingSeedCount > 0 || !isAllElevatorIdle();
     }
 
     private void onProcessSeed(Seed seed) {
@@ -76,31 +109,29 @@ public class ElevatorController extends TimerTask {
 
     private void onProcessElevatorNextStep() {
         int elevatorCount = elevatorCollect.getSize();
-        
+
         // 1. 清除电梯所在楼层seeds的stepCost
         seedsOnFloorCollect.clearAllStepCost();
 
         EdgeSeedFloor edgeFloor = new EdgeSeedFloor();
         seedsOnFloorCollect.getTopBottomSeedFloor(edgeFloor);
-        
+
         // 2. 标记空载的电梯，如果没有目标seed，将要停下
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
             elevator.preSetActive(edgeFloor);
         }
-        
+
         // 3. 更新所有楼层seeds的stepCost
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
             int totalFloorSize = seedsOnFloorCollect.getFloorSize();
             for (int floor = 0; floor < totalFloorSize; floor++) {
-                elevator.preHandleSeeds(floor + 1, 
-                        seedsOnFloorCollect.getSeedsListAt(floor),
-                        edgeFloor.getTop(),
+                elevator.preHandleSeeds(floor + 1, seedsOnFloorCollect.getSeedsListAt(floor), edgeFloor.getTop(),
                         edgeFloor.getBottom());
             }
         }
-        
+
         // 4. 便利所有seed，启动有相应标记的电梯
         int totalFloorSize = seedsOnFloorCollect.getFloorSize();
         for (int floor = 0; floor < totalFloorSize; floor++) {
@@ -122,14 +153,14 @@ public class ElevatorController extends TimerTask {
             Elevator elevator = elevatorCollect.get(i);
             elevator.setActiveIdle();
         }
-        
+
         // 6. 电梯载人，走向下一个楼层
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
             int floor = elevator.getCurrentFloor();
             int id = elevator.getId();
             ArrayList<Seed> newSeeds = seedsOnFloorCollect.takeSeeds(floor - 1, id, elevator.getMoveStatus());
-            
+
             elevator.takeSeeds(newSeeds);
             elevator.gotoNextFloor();
         }
@@ -140,7 +171,7 @@ public class ElevatorController extends TimerTask {
             elevator.onStopAtFloor();
         }
     }
-    
+
     private boolean isAllElevatorIdle() {
         int idleCnt = 0;
         int elevatorCount = elevatorCollect.getSize();
@@ -152,7 +183,7 @@ public class ElevatorController extends TimerTask {
         }
         return idleCnt == elevatorCount;
     }
-    
+
 //    private int getTotalElevatorStep() {
 //        int step = 0;
 //        int elevatorCount = elevatorCollect.getSize();
@@ -172,8 +203,8 @@ public class ElevatorController extends TimerTask {
 //        }
 //        return load;
 //    }
-    
+
     private void dumpCurrentStatus() {
-        
+
     }
 }
