@@ -14,6 +14,6 @@ public class Constants {
     // 单位时长(ms)
     public static final int timeSlot = 1;
     
-    public static final String seedFilePath = "./seeds.txt";
+    public static final String seedFilePath = "./seeds/seeds.txt";
     
 }
