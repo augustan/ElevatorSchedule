@@ -167,6 +167,7 @@ public class ElevatorController {
             elevator.gotoNextFloor();
         }
 
+        Statistic.addTimeTick();
         // 7. 电梯停在某楼层
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);

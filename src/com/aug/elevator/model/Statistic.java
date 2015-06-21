@@ -7,15 +7,18 @@ public class Statistic {
     private static int seedCount = 0; // seed总数
     private static int minLoad = 0;   // 根据seed的属性计算出的最小消耗
     
-    private static int timeTickTack = 0;
+    private static int timeTickTack = 1;
     private static int totalStep = 0;  // 总移动步数
     private static int totalLoad = 0;  // 总负载
     
     private static int totalWaitTime = 0;  // 乘客等待上电梯的时间
     private static int totalSpendTime = 0;  // 乘客总共等待时间
     
-    public static int onTimeLapse() {
+    public static void addTimeTick() {
         timeTickTack++;
+    }
+    
+    public static int onTimeLapse() {
         return timeTickTack;
     }
     
@@ -47,6 +50,10 @@ public class Statistic {
     public static void onReleaseSeed(Seed seed) {
         seed.setReleaseTime(timeTickTack);
         totalSpendTime += (timeTickTack - seed.getBeginTime());
+        LogUtils.d("[onReleaseSeed] " + seed.toDumpString());
+        LogUtils.d("[onRe2leaseSeed] begin at " + seed.getBeginTime());
+        LogUtils.d("[onRe2leaseSeed] on at " + seed.getTakeTime());
+        LogUtils.d("[onRe2leaseSeed] off at " + seed.getReleaseTime());
     }
     
     public static void showResule() {
