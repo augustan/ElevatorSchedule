@@ -108,6 +108,9 @@ public class Elevator {
     
     public void takeSeeds(ArrayList<Seed> newSeeds) {
         for (Seed seed : newSeeds) {
+            if (moveStatus == MoveStatus.IDLE && loadSeeds.size() == 0) {
+                moveStatus = seed.isDown() ? MoveStatus.DOWN : MoveStatus.UP;
+            }
             loadSeeds.add(seed);
             Statistic.onTakeSeed(seed);
             LogUtils.e(String.format("   [TAKE] #%d# take %s. at floor = %d. load = %d", id, seed.toDumpString(),
