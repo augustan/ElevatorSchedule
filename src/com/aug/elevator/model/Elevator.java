@@ -167,12 +167,18 @@ public class Elevator {
               setMoveStatus(currentFloor > seedGotoFloor ? MoveStatus.DOWN : MoveStatus.UP);
               setted = true;
           }
-      } else if (moveStatus == MoveStatus.PRE_DOWN && currentFloor > seedAtFloor) {
-          setMoveStatus(MoveStatus.DOWN);
-          setted = true;
-      } else if (moveStatus == MoveStatus.PRE_UP && currentFloor < seedAtFloor) {
-          setMoveStatus(MoveStatus.UP);
-          setted = true;
+      } else if (moveStatus == MoveStatus.PRE_DOWN) {
+          if (currentFloor > seedAtFloor || 
+                  (currentFloor == seedAtFloor && currentFloor > seedGotoFloor)) {
+              setMoveStatus(MoveStatus.DOWN);
+              setted = true;
+          }
+      } else if (moveStatus == MoveStatus.PRE_UP) {
+          if (currentFloor < seedAtFloor || 
+                  (currentFloor == seedAtFloor && currentFloor < seedGotoFloor)) {
+              setMoveStatus(MoveStatus.UP);
+              setted = true;
+          }
       }
 
       if (setted) {

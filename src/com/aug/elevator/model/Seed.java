@@ -121,7 +121,9 @@ public class Seed {
         if (stepCost < minStepCost) {
             minStepCost = stepCost;
             this.markElevatorId = markElevatorId;
-            LogUtils.d("   [SEED] " + this.toDumpString() + " set ElevatorId = " + markElevatorId);
+            LogUtils.d("   [SEED] " + this.toDumpString() + 
+                    " set ElevatorId = " + markElevatorId + 
+                    " Cost = " + minStepCost);
         }
     }
     
