@@ -37,11 +37,7 @@ public class StandardPolicy extends ElevatorPolicy {
             
             boolean sameDir = elevatorIdle || (elevatorGoUp && !seed.isDown()) || (elevatorGoDown && seed.isDown());
             if (sameDir) {
-                if (elevator.willStopAtFloor(seedAtFloor)) {
-                    stepCost = 0;
-                } else {
-                    stepCost = Math.abs(elevator.getCurrentFloor() - seedAtFloor);
-                }
+                stepCost = Math.abs(elevator.getCurrentFloor() - seedAtFloor);
             } else if (elevatorGoUp) {
                 stepCost = Math.abs(elevator.getCurrentFloor() - topFloor);
                 stepCost += Math.abs(topFloor - seedAtFloor);

@@ -106,18 +106,6 @@ public class Elevator {
         return edge;
     }
     
-    public boolean willStopAtFloor(int floor) {
-        boolean stop = false;
-        for (int i = loadSeeds.size() - 1; i >= 0; i--) {
-            Seed seed = loadSeeds.get(i);
-            stop = seed.getToFloor() == floor;
-            if (stop) {
-                break;
-            }
-        }
-        return stop;
-    }
-
     public void takeSeeds(ArrayList<Seed> newSeeds) {
         for (Seed seed : newSeeds) {
             loadSeeds.add(seed);
