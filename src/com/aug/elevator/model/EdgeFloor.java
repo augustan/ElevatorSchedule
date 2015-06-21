@@ -4,7 +4,7 @@ package com.aug.elevator.model;
  * 楼层数从1开始
  *
  */
-public class EdgeSeedFloor {
+public class EdgeFloor {
     private int top = 0;
     private int bottom = Integer.MAX_VALUE;
     

@@ -1,6 +1,6 @@
 package com.aug.elevator.model.collect;
 
-import com.aug.elevator.model.EdgeSeedFloor;
+import com.aug.elevator.model.EdgeFloor;
 import com.aug.elevator.model.Seed;
 import com.aug.elevator.model.Elevator.MoveStatus;
 
@@ -79,11 +79,13 @@ public class SeedsOnFloorCollect {
         }
     }
     
-    public void getTopBottomSeedFloor(EdgeSeedFloor edgeFloor) {
+    public EdgeFloor getTopBottomSeedFloor() {
+        EdgeFloor edgeFloor = new EdgeFloor();
         for (int i = 0; i < floorSize; i++) {
             if (getSeedsListAt(i).size() > 0) {
                 edgeFloor.setFloor(i + 1);
             }
         }
+        return edgeFloor;
     }
 }

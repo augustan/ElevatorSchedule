@@ -1,6 +1,6 @@
 package com.aug.elevator.main;
 
-import com.aug.elevator.model.EdgeSeedFloor;
+import com.aug.elevator.model.EdgeFloor;
 import com.aug.elevator.model.Elevator;
 import com.aug.elevator.model.Seed;
 import com.aug.elevator.model.Statistic;
@@ -59,7 +59,7 @@ public class ElevatorController {
         boolean finish = false;
         int timeCount = Statistic.onTimeLapse();
         LogUtils.d("run time = " + timeCount);
-        if (timeCount == 18) {
+        if (timeCount == 216) {
             int debug = timeCount;
             debug++;
         }
@@ -115,13 +115,12 @@ public class ElevatorController {
         LogUtils.d("   [CONTROL] clear all seeds' ElevatorId");
         seedsOnFloorCollect.clearAllStepCost();
 
-        EdgeSeedFloor edgeFloor = new EdgeSeedFloor();
-        seedsOnFloorCollect.getTopBottomSeedFloor(edgeFloor);
+        EdgeFloor seedsEdgeFloor = seedsOnFloorCollect.getTopBottomSeedFloor();
 
         // 2. 标记空载的电梯，如果没有目标seed，将要停下
         for (int i = 0; i < elevatorCount; i++) {
             Elevator elevator = elevatorCollect.get(i);
-            elevator.preSetActive(edgeFloor);
+            elevator.preSetActive(seedsEdgeFloor);
         }
 
         // 3. 更新所有楼层seeds的stepCost
@@ -129,8 +128,7 @@ public class ElevatorController {
             Elevator elevator = elevatorCollect.get(i);
             int totalFloorSize = seedsOnFloorCollect.getFloorSize();
             for (int floor = 0; floor < totalFloorSize; floor++) {
-                elevator.preHandleSeeds(floor + 1, seedsOnFloorCollect.getSeedsListAt(floor), edgeFloor.getTop(),
-                        edgeFloor.getBottom());
+                elevator.preHandleSeeds(floor + 1, seedsOnFloorCollect.getSeedsListAt(floor), seedsEdgeFloor);
             }
         }
 

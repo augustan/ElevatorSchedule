@@ -81,8 +81,8 @@ public class Elevator {
      * @param seedsListAtFloor
      */
     public void preHandleSeeds(int seedAtFloor, ArrayList<Seed> seedsListAtFloor,
-            int topFloor, int bottomFloor) {
-        elevatorPolicy.preHandleSeeds(this, seedAtFloor, seedsListAtFloor, topFloor, bottomFloor);
+            EdgeFloor seedsEdgeFloor) {
+        elevatorPolicy.preHandleSeeds(this, seedAtFloor, seedsListAtFloor, seedsEdgeFloor, getTakingEdgeFloor());
     }
 
     private void releaseSeeds() {
@@ -95,6 +95,27 @@ public class Elevator {
                         seed.toDumpString(), currentFloor, getCurrentLoad()));
             }
         }
+    }
+    
+    private EdgeFloor getTakingEdgeFloor() {
+        EdgeFloor edge = new EdgeFloor();
+        for (int i = loadSeeds.size() - 1; i >= 0; i--) {
+            Seed seed = loadSeeds.get(i);
+            edge.setFloor(seed.getToFloor());
+        }
+        return edge;
+    }
+    
+    public boolean willStopAtFloor(int floor) {
+        boolean stop = false;
+        for (int i = loadSeeds.size() - 1; i >= 0; i--) {
+            Seed seed = loadSeeds.get(i);
+            stop = seed.getToFloor() == floor;
+            if (stop) {
+                break;
+            }
+        }
+        return stop;
     }
 
     public void takeSeeds(ArrayList<Seed> newSeeds) {
@@ -139,10 +160,10 @@ public class Elevator {
         }
     }
 
-    public void preSetActive(EdgeSeedFloor edgeFloor) {
+    public void preSetActive(EdgeFloor seedsEdgeFloor) {
         if (getCurrentLoad() == 0) {
-            if (currentFloor >= edgeFloor.getTop() || 
-                    currentFloor <= edgeFloor.getBottom()) {
+            if (currentFloor >= seedsEdgeFloor.getTop() || 
+                    currentFloor <= seedsEdgeFloor.getBottom()) {
                 setMoveStatus(MoveStatus.IDLE);
             } else if (moveStatus == MoveStatus.DOWN) {
                 setMoveStatus(MoveStatus.PRE_DOWN);
