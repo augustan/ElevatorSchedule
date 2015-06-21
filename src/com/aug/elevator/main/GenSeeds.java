@@ -11,7 +11,7 @@ public class GenSeeds {
         FileOutputStream fo = null;
         try {
             fo = new FileOutputStream(Constants.seedFilePath);
-            fo.write("#id, 楼层, 上/下按钮, 要去几层, 读取下一条数据间隔时间\n".getBytes());
+            fo.write("#id, 楼层, 上/下按钮, 要去几层, 本条数据生效的间隔时间\n".getBytes());
             
             for (int i = 0; i < Constants.recordCount; i++) {
                 Seed seed = new Seed(i + 1);

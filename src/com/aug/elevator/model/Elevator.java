@@ -133,9 +133,9 @@ public class Elevator {
                 currentFloor--;
                 totalStep++;
                 totalLoad += getCurrentLoad();
-                Statistic.onMove(this);
                 LogUtils.e(String.format("   [MOVE] #%d# move down arrive floor = %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
                         totalStep, totalLoad, getCurrentLoad()));
+                Statistic.onMove(this);
             }
         } else if (moveStatus == MoveStatus.UP) {
             if (isReachTop()) {
@@ -144,9 +144,9 @@ public class Elevator {
                 currentFloor++;
                 totalStep++;
                 totalLoad += getCurrentLoad();
-                Statistic.onMove(this);
                 LogUtils.e(String.format("   [MOVE] #%d# move up arrive floor = %d. total_step = %d, total_load = %d. load = %d", id, currentFloor,
                         totalStep, totalLoad, getCurrentLoad()));
+                Statistic.onMove(this);
             }
         }
     }

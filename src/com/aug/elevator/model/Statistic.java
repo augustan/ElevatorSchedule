@@ -25,6 +25,7 @@ public class Statistic {
     public static void onMove(Elevator elevator) {
         totalStep++;
         totalLoad += elevator.getCurrentLoad();
+        LogUtils.d("   [Statistic] totalLoad = " + totalLoad);
     }
 
     /**
@@ -50,10 +51,6 @@ public class Statistic {
     public static void onReleaseSeed(Seed seed) {
         seed.setReleaseTime(timeTickTack);
         totalSpendTime += (timeTickTack - seed.getBeginTime());
-        LogUtils.d("[onReleaseSeed] " + seed.toDumpString());
-        LogUtils.d("[onRe2leaseSeed] begin at " + seed.getBeginTime());
-        LogUtils.d("[onRe2leaseSeed] on at " + seed.getTakeTime());
-        LogUtils.d("[onRe2leaseSeed] off at " + seed.getReleaseTime());
     }
     
     public static void showResule() {
