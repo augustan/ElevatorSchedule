@@ -187,26 +187,6 @@ public class ElevatorController {
         return idleCnt == elevatorCount;
     }
 
-//    private int getTotalElevatorStep() {
-//        int step = 0;
-//        int elevatorCount = elevatorCollect.getSize();
-//        for (int i = 0; i < elevatorCount; i++) {
-//            Elevator elevator = elevatorCollect.get(i);
-//            step += elevator.getTotalStep();
-//        }
-//        return step;
-//    }
-//
-//    private int getTotalElevatorLoad() {
-//        int load = 0;
-//        int elevatorCount = elevatorCollect.getSize();
-//        for (int i = 0; i < elevatorCount; i++) {
-//            Elevator elevator = elevatorCollect.get(i);
-//            load += elevator.getTotalLoad();
-//        }
-//        return load;
-//    }
-
     private void dumpCurrentStatus() {
         if (enableDumpAllStatus) {
             LogUtils.e("[DUMP START] =================== [DUMP START]");

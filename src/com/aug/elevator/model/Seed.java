@@ -14,7 +14,7 @@ public class Seed {
     private static final String DIR_UP = "UP";
     private static final String DIR_DOWN = "DOWN";
     
-    // ID. 楼层   上/下按钮   要去几层    读取下一条数据间隔时间  
+    // ID.   楼层   上/下按钮   要去几层   本条数据生效的间隔时间
     private static final String seedLineFormat = "%d,%d,%s,%d,%d";
     
     private static Random random = new Random(System.nanoTime());
